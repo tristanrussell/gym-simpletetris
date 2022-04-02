@@ -68,11 +68,12 @@ env = gym.make('SimpleTetris-v0',
                obs_type='ram',                  # ram | grayscale | rgb
                extend_dims=False,               # Extend grayscale dimensions
                render_mode='rgb_array',         # Only supports rgb_array
-               reward_step=False,               # see reward table
-               penalise_height=False,           # see reward table
-               penalise_height_increase=False,  # see reward table
-               advanced_clears=False,           # see reward table
-               high_scoring=False               # see reward table
+               reward_step=False,               # See reward table
+               penalise_height=False,           # See reward table
+               penalise_height_increase=False,  # See reward table
+               advanced_clears=False,           # See reward table
+               high_scoring=False,              # See reward table
+               penalise_holes=False             # See reward table
                )
 ```
 
@@ -93,6 +94,7 @@ render option is planned in a future update.**
 | `penalise_height_increase` | Penalises an increase in the height of the Tetris tower. At each time step, if the height increases then a negative reward equal to the increase is given.                                                                                |
 | `advanced_clears`          | Changes the rewards for clearing lines to be similar to the modern Tetris system. The new rewards are 100 for a single line clear, 250 for a double line clear, 750 for a triple line clear and 3000 for a Tetris (quadruple line clear). |
 | `high_scoring`             | Changes the reward given for each line clear to 1000.                                                                                                                                                                                     |
+| `penalise_holes`           | Penalises the number of holes in the current Tetris tower. A hole is an empty cell with at least one non-empty cell above it.                                                                                                             |
 
 **Note: `penalise_height` and `penalise_height_increase` cannot be used together.
 If both are enabled then penalise_height will be used.**
@@ -107,6 +109,8 @@ The info dictionary returned by each step includes the following keys:
 | `current_piece` | `string` | The letter representing the current piece                          |
 | `score`         | `int`    | The score of the current game                                      |
 | `lines_cleared` | `int`    | The number of lines cleared in the current game                    |
+| `holes`         | `int`    | The number of holes in the current Tetris tower                    |
+| `deaths`        | `int`    | The number of deaths since the environment was created             |
 | `statistics`    | `dict`   | The number of Tetris pieces dispatched by type                     |
 
 

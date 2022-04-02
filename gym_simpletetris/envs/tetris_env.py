@@ -129,7 +129,8 @@ class TetrisEngine:
                  penalise_height=False,
                  penalise_height_increase=False,
                  advanced_clears=False,
-                 high_scoring=False):
+                 high_scoring=False,
+                 penalise_holes=False):
         self.width = width
         self.height = height
         self.board = np.zeros(shape=(width, height), dtype=np.float)
@@ -138,7 +139,8 @@ class TetrisEngine:
             'penalise_height': penalise_height,
             'penalise_height_increase': penalise_height_increase,
             'advanced_clears': advanced_clears,
-            'high_scoring': high_scoring
+            'high_scoring': high_scoring,
+            'penalise_holes': penalise_holes
         }
 
         # actions are triggered by letters
@@ -157,6 +159,7 @@ class TetrisEngine:
         # for running the engine
         self.time = -1
         self.score = -1
+        self.holes = 0
         self.lines_cleared = 0
         self.piece_height = 0
         self.anchor = None
@@ -203,6 +206,10 @@ class TetrisEngine:
 
         return sum(can_clear)
 
+    def _count_holes(self):
+        self.holes = np.count_nonzero(self.board.cumsum(axis=1) * ~self.board.astype(bool))
+        return self.holes
+
     def valid_action_count(self):
         valid_action_sum = 0
 
@@ -219,6 +226,8 @@ class TetrisEngine:
             'current_piece': self.shape_name,
             'score': self.score,
             'lines_cleared': self.lines_cleared,
+            'holes': self.holes,
+            'deaths': self.n_deaths,
             'statistics': self.shape_counts
         }
 
@@ -251,10 +260,13 @@ class TetrisEngine:
                 self.score += cleared_lines
 
             if np.any(self.board[:, 0]):
+                self._count_holes()
                 self.n_deaths += 1
                 done = True
                 reward = -100
             else:
+                self._count_holes()
+
                 if self.scoring.get('penalise_height'):
                     reward -= sum(np.any(self.board, axis=0))
                 elif self.scoring.get('penalise_height_increase'):
@@ -262,6 +274,10 @@ class TetrisEngine:
                     if new_height > self.piece_height:
                         reward -= 10 * (new_height - self.piece_height)
                     self.piece_height = new_height
+
+                if self.scoring.get('penalise_holes'):
+                    reward -= 5 * self.holes
+
                 self._new_piece()
 
         self._set_piece(True)
@@ -272,6 +288,7 @@ class TetrisEngine:
     def clear(self):
         self.time = 0
         self.score = 0
+        self.holes = 0
         self.lines_cleared = 0
         self.piece_height = 0
         self._new_piece()
@@ -303,7 +320,7 @@ class TetrisEngine:
 class TetrisEnv(gym.Env):
     metadata = {'render.modes': ['rgb_array']}  # TODO: Add human
 
-    # TODO: Add more reward options e.g. holes, wells
+    # TODO: Add more reward options e.g. wells
     def __init__(self,
                  width=10,
                  height=20,
@@ -314,7 +331,8 @@ class TetrisEnv(gym.Env):
                  penalise_height=False,
                  penalise_height_increase=False,
                  advanced_clears=False,
-                 high_scoring=False):
+                 high_scoring=False,
+                 penalise_holes=False):
         self.width = width
         self.height = height
         self.obs_type = obs_type
@@ -327,7 +345,8 @@ class TetrisEnv(gym.Env):
                                    penalise_height,
                                    penalise_height_increase,
                                    advanced_clears,
-                                   high_scoring)
+                                   high_scoring,
+                                   penalise_holes)
 
         self.action_space = spaces.Discrete(7)
 
