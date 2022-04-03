@@ -73,7 +73,8 @@ env = gym.make('SimpleTetris-v0',
                penalise_height_increase=False,  # See reward table
                advanced_clears=False,           # See reward table
                high_scoring=False,              # See reward table
-               penalise_holes=False             # See reward table
+               penalise_holes=False,            # See reward table
+               lock_delay=0                     # Lock delay as number of steps
                )
 ```
 

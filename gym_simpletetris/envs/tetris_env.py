@@ -125,6 +125,7 @@ class TetrisEngine:
     def __init__(self,
                  width,
                  height,
+                 lock_delay=0,
                  reward_step=False,
                  penalise_height=False,
                  penalise_height_increase=False,
@@ -166,6 +167,9 @@ class TetrisEngine:
         self.shape = None
         self.shape_name = None
         self.n_deaths = 0
+
+        self._lock_delay_fn = lambda x: (x + 1) % (max(lock_delay, 0) + 1)
+        self._lock_delay = 0
 
         # used for generating shapes
         # self.shape_counts = [0] * len(shapes)
@@ -239,46 +243,49 @@ class TetrisEngine:
 
         # Update time and reward
         self.time += 1
-        reward = self.valid_action_count()
+        # reward = self.valid_action_count()
         # reward = random.randint(0, 0)
         reward = 1 if self.scoring.get('reward_step') else 0
 
         done = False
         if self._has_dropped():
-            self._set_piece(True)
-            cleared_lines = self._clear_lines()
+            self._lock_delay = self._lock_delay_fn(self._lock_delay)
 
-            if self.scoring.get('advanced_clears'):
-                scores = [0, 40, 100, 300, 1200]
-                reward += 2.5 * scores[cleared_lines]
-                self.score += scores[cleared_lines]
-            elif self.scoring.get('high_scoring'):
-                reward += 1000 * cleared_lines
-                self.score += cleared_lines
-            else:
-                reward += 100 * cleared_lines
-                self.score += cleared_lines
+            if self._lock_delay == 0:
+                self._set_piece(True)
+                cleared_lines = self._clear_lines()
 
-            if np.any(self.board[:, 0]):
-                self._count_holes()
-                self.n_deaths += 1
-                done = True
-                reward = -100
-            else:
-                self._count_holes()
+                if self.scoring.get('advanced_clears'):
+                    scores = [0, 40, 100, 300, 1200]
+                    reward += 2.5 * scores[cleared_lines]
+                    self.score += scores[cleared_lines]
+                elif self.scoring.get('high_scoring'):
+                    reward += 1000 * cleared_lines
+                    self.score += cleared_lines
+                else:
+                    reward += 100 * cleared_lines
+                    self.score += cleared_lines
 
-                if self.scoring.get('penalise_height'):
-                    reward -= sum(np.any(self.board, axis=0))
-                elif self.scoring.get('penalise_height_increase'):
-                    new_height = sum(np.any(self.board, axis=0))
-                    if new_height > self.piece_height:
-                        reward -= 10 * (new_height - self.piece_height)
-                    self.piece_height = new_height
+                if np.any(self.board[:, 0]):
+                    self._count_holes()
+                    self.n_deaths += 1
+                    done = True
+                    reward = -100
+                else:
+                    self._count_holes()
 
-                if self.scoring.get('penalise_holes'):
-                    reward -= 5 * self.holes
+                    if self.scoring.get('penalise_height'):
+                        reward -= sum(np.any(self.board, axis=0))
+                    elif self.scoring.get('penalise_height_increase'):
+                        new_height = sum(np.any(self.board, axis=0))
+                        if new_height > self.piece_height:
+                            reward -= 10 * (new_height - self.piece_height)
+                        self.piece_height = new_height
 
-                self._new_piece()
+                    if self.scoring.get('penalise_holes'):
+                        reward -= 5 * self.holes
+
+                    self._new_piece()
 
         self._set_piece(True)
         state = np.copy(self.board)
@@ -321,6 +328,7 @@ class TetrisEnv(gym.Env):
     metadata = {'render.modes': ['rgb_array']}  # TODO: Add human
 
     # TODO: Add more reward options e.g. wells
+    # TODO: Reorganise on next major release
     def __init__(self,
                  width=10,
                  height=20,
@@ -332,7 +340,8 @@ class TetrisEnv(gym.Env):
                  penalise_height_increase=False,
                  advanced_clears=False,
                  high_scoring=False,
-                 penalise_holes=False):
+                 penalise_holes=False,
+                 lock_delay=0):
         self.width = width
         self.height = height
         self.obs_type = obs_type
@@ -341,6 +350,7 @@ class TetrisEnv(gym.Env):
 
         self.engine = TetrisEngine(width,
                                    height,
+                                   lock_delay,
                                    reward_step,
                                    penalise_height,
                                    penalise_height_increase,
