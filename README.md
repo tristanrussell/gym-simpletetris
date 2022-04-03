@@ -66,7 +66,7 @@ env = gym.make('SimpleTetris-v0',
                height=20,                       # Height of Tetris grid
                width=10,                        # Width of Tetris grid
                obs_type='ram',                  # ram | grayscale | rgb
-               extend_dims=False,               # Extend grayscale dimensions
+               extend_dims=False,               # Extend ram or grayscale dimensions
                render_mode='rgb_array',         # Only supports rgb_array
                reward_step=False,               # See reward table
                penalise_height=False,           # See reward table
@@ -81,7 +81,9 @@ env = gym.make('SimpleTetris-v0',
 If using an observation type of grayscale or rgb then the environment will be
 as an array of size 84 x 84. If using grayscale, then the grid can be returned
 as 84 x 84 or extended to 84 x 84 x 1 if `entend_dims` is set to True. The rgb
-array will always be returned as 84 x 84 x 3.
+array will always be returned as 84 x 84 x 3. If using an observation type of
+ram and `extend_dims` is set then an array of size width x height x 1 is
+returned.
 
 **Note: The environment only supports rendering as `rgb_array` at this time but a human
 render option is planned in a future update.**

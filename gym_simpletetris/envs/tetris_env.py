@@ -361,7 +361,10 @@ class TetrisEnv(gym.Env):
         self.action_space = spaces.Discrete(7)
 
         if obs_type == 'ram':
-            self.observation_space = spaces.Box(0, 1, shape=(10, 20), dtype=np.float32)
+            if extend_dims:
+                self.observation_space = spaces.Box(0, 1, shape=(width, height, 1), dtype=np.float32)
+            else:
+                self.observation_space = spaces.Box(0, 1, shape=(width, height), dtype=np.float32)
         elif obs_type == 'grayscale':
             if extend_dims:
                 self.observation_space = spaces.Box(0, 1, shape=(84, 84, 1), dtype=np.float32)
@@ -398,7 +401,9 @@ class TetrisEnv(gym.Env):
         new_mode = self.obs_type if mode is None else mode
 
         if new_mode == 'ram':
-            return obs
+            extend = self.extend_dims if extend_dims is None else extend_dims
+
+            return np.reshape(obs, newshape=(self.width, self.height, 1)) if extend else obs
         else:
             obs = convert_grayscale(obs, 84)
 
