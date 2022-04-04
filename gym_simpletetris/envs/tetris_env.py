@@ -126,6 +126,7 @@ class TetrisEngine:
                  width,
                  height,
                  lock_delay=0,
+                 step_reset=False,
                  reward_step=False,
                  penalise_height=False,
                  penalise_height_increase=False,
@@ -170,6 +171,7 @@ class TetrisEngine:
 
         self._lock_delay_fn = lambda x: (x + 1) % (max(lock_delay, 0) + 1)
         self._lock_delay = 0
+        self._step_reset = step_reset
 
         # used for generating shapes
         # self.shape_counts = [0] * len(shapes)
@@ -239,7 +241,10 @@ class TetrisEngine:
         self.anchor = (int(self.anchor[0]), int(self.anchor[1]))
         self.shape, self.anchor = self.value_action_map[action](self.shape, self.anchor, self.board)
         # Drop each step
-        self.shape, self.anchor = soft_drop(self.shape, self.anchor, self.board)
+        self.shape, new_anchor = soft_drop(self.shape, self.anchor, self.board)
+        if self._step_reset and (self.anchor != new_anchor):
+            self._lock_delay = 0
+        self.anchor = new_anchor
 
         # Update time and reward
         self.time += 1
@@ -341,7 +346,8 @@ class TetrisEnv(gym.Env):
                  advanced_clears=False,
                  high_scoring=False,
                  penalise_holes=False,
-                 lock_delay=0):
+                 lock_delay=0,
+                 step_reset=False):
         self.width = width
         self.height = height
         self.obs_type = obs_type
@@ -351,6 +357,7 @@ class TetrisEnv(gym.Env):
         self.engine = TetrisEngine(width,
                                    height,
                                    lock_delay,
+                                   step_reset,
                                    reward_step,
                                    penalise_height,
                                    penalise_height_increase,
