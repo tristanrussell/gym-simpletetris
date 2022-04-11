@@ -74,6 +74,7 @@ env = gym.make('SimpleTetris-v0',
                advanced_clears=False,           # See reward table
                high_scoring=False,              # See reward table
                penalise_holes=False,            # See reward table
+               penalise_holes_increase=False,   # See reward table
                lock_delay=0,                    # Lock delay as number of steps
                step_reset=False                 # Reset lock delay on step downwards
                )
@@ -99,9 +100,13 @@ render option is planned in a future update.**
 | `advanced_clears`          | Changes the rewards for clearing lines to be similar to the modern Tetris system. The new rewards are 100 for a single line clear, 250 for a double line clear, 750 for a triple line clear and 3000 for a Tetris (quadruple line clear). |
 | `high_scoring`             | Changes the reward given for each line clear to 1000.                                                                                                                                                                                     |
 | `penalise_holes`           | Penalises the number of holes in the current Tetris tower. A hole is an empty cell with at least one non-empty cell above it.                                                                                                             |
+| `penalise_holes_increase`  | Penalises an increase in the number of holes in the current Tetris tower.                                                                                                                                                                 |
 
 **Note: `penalise_height` and `penalise_height_increase` cannot be used together.
-If both are enabled then penalise_height will be used.**
+If both are enabled then `penalise_height` will be used.**
+
+**Note: `penalise_holes` and `penalise_holes_increase` cannot be used together.
+If both are enabled then `penalise_holes` will be used.**
 
 ### `info` dictionary
 
