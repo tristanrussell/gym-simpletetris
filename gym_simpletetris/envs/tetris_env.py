@@ -150,13 +150,13 @@ class TetrisEngine:
 
         # actions are triggered by letters
         self.value_action_map = {
-            0: left,
-            1: right,
-            2: hard_drop,
-            3: soft_drop,
-            4: rotate_left,
-            5: rotate_right,
-            6: idle,
+            0: idle,
+            1: left,
+            2: right,
+            3: hard_drop,
+            4: soft_drop,
+            5: rotate_left,
+            6: rotate_right
         }
         self.action_value_map = dict([(j, i) for i, j in self.value_action_map.items()])
         self.nb_actions = len(self.value_action_map)
