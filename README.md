@@ -67,7 +67,6 @@ env = gym.make('SimpleTetris-v0',
                width=10,                        # Width of Tetris grid
                obs_type='ram',                  # ram | grayscale | rgb
                extend_dims=False,               # Extend ram or grayscale dimensions
-               render_mode='rgb_array',         # Unused parameter
                reward_step=False,               # See reward table
                penalise_height=False,           # See reward table
                penalise_height_increase=False,  # See reward table
@@ -86,10 +85,6 @@ as 84 x 84 or extended to 84 x 84 x 1 if `entend_dims` is set to True. The rgb
 array will always be returned as 84 x 84 x 3. If using an observation type of
 ram and `extend_dims` is set then an array of size width x height x 1 is
 returned.
-
-**Note: The default render mode is human. The `render_mode` parameter does not
-alter the default render mode. To render using `rgb_array` then please use the
-mode option when calling `env.render(mode='rgb_array')`.**
 
 ### Reward Table
 
