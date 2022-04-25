@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='gym_simpletetris',
-    version='0.3.0',
+    version='0.4.0',
     author="Tristan Russell",
     license='MIT',
     description="A simple Tetris engine for OpenAI Gym",
@@ -16,7 +16,8 @@ setup(
         "Bug Tracker": "https://github.com/tristanrussell/gym-simpletetris/issues",
     },
     install_requires=['gym>=0.21.0',
-                      'numpy>=0.21.0'],
+                      'numpy>=0.21.0',
+                      'pygame>=2.1.0'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",

@@ -2,6 +2,7 @@ import numpy as np
 import random
 import gym
 from gym import spaces
+import pygame
 
 # Adapted from the Tetris engine in the TetrisRL project by jaybutera
 # https://github.com/jaybutera/tetrisRL
@@ -335,7 +336,7 @@ class TetrisEngine:
 
 
 class TetrisEnv(gym.Env):
-    metadata = {'render.modes': ['rgb_array']}  # TODO: Add human
+    metadata = {'render.modes': ['human', 'rgb_array'], "render_fps": 8}
 
     # TODO: Add more reward options e.g. wells
     # TODO: Reorganise on next major release
@@ -359,6 +360,7 @@ class TetrisEnv(gym.Env):
         self.obs_type = obs_type
         self.extend_dims = extend_dims
         self.render_mode = render_mode
+        self.window_size = 512
 
         self.engine = TetrisEngine(width,
                                    height,
@@ -373,6 +375,8 @@ class TetrisEnv(gym.Env):
                                    penalise_holes_increase)
 
         self.action_space = spaces.Discrete(7)
+        self.window = None
+        self.clock = None
 
         if obs_type == 'ram':
             if extend_dims:
@@ -428,22 +432,36 @@ class TetrisEnv(gym.Env):
             else:
                 return convert_grayscale_rgb(obs)
 
-    def render(self, mode=None):
-        new_mode = self.render_mode if mode is None else mode
+    def render(self, mode='human'):
+        if mode == 'human':
+            if self.window is None:
+                pygame.init()
+                pygame.display.init()
+                self.window = pygame.display.set_mode((self.window_size, self.window_size))
+            if self.clock is None:
+                self.clock = pygame.time.Clock()
 
-        if new_mode not in self.metadata.get('render.modes'):
-            print("Invalid render mode.")
-            return
+            obs = self.engine.render()
+            obs = np.transpose(obs)
+            obs = convert_grayscale(obs, self.window_size)
+            obs = convert_grayscale_rgb(obs)
 
-        obs = self.engine.render()
-        obs = convert_grayscale(obs, 160)
-        obs = convert_grayscale_rgb(obs)
+            pygame.pixelcopy.array_to_surface(self.window, obs)
 
-        if new_mode == 'rgb_array':
+            canvas = pygame.surfarray.make_surface(obs)
+
+            self.window.blit(canvas, canvas.get_rect())
+            pygame.event.pump()
+            pygame.display.update()
+
+            self.clock.tick(self.metadata["render_fps"])
+        elif mode == 'rgb_array':
+            obs = self.engine.render()
+            obs = convert_grayscale(obs, 160)
+            obs = convert_grayscale_rgb(obs)
             return obs
         else:
-            # TODO: Human mode
-            return
+            super(TetrisEnv, self).render(mode=mode)
 
     def close(self):
         del self.engine
