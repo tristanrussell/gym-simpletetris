@@ -345,7 +345,6 @@ class TetrisEnv(gym.Env):
                  height=20,
                  obs_type='ram',
                  extend_dims=False,
-                 render_mode='rgb_array',
                  reward_step=False,
                  penalise_height=False,
                  penalise_height_increase=False,
@@ -359,7 +358,6 @@ class TetrisEnv(gym.Env):
         self.height = height
         self.obs_type = obs_type
         self.extend_dims = extend_dims
-        self.render_mode = render_mode
         self.window_size = 512
 
         self.engine = TetrisEngine(width,
