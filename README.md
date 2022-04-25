@@ -68,12 +68,10 @@ env = gym.make('SimpleTetris-v0',
                obs_type='ram',                  # ram | grayscale | rgb
                extend_dims=False,               # Extend ram or grayscale dimensions
                reward_step=False,               # See reward table
-               penalise_height=False,           # See reward table
-               penalise_height_increase=False,  # See reward table
+               penalise_height=None,            # enabled | increase
                advanced_clears=False,           # See reward table
                high_scoring=False,              # See reward table
-               penalise_holes=False,            # See reward table
-               penalise_holes_increase=False,   # See reward table
+               penalise_holes=None,             # enabled | increase
                lock_delay=0,                    # Lock delay as number of steps
                step_reset=False                 # Reset lock delay on step downwards
                )
@@ -88,21 +86,13 @@ returned.
 
 ### Reward Table
 
-| Option                     | Description                                                                                                                                                                                                                               |
-|:---------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `reward_step`              | Adds a reward of +1 for every time step that does not include a line clear or end of game.                                                                                                                                                |
-| `penalise_height`          | Penalises the height of the current Tetris tower at every time step. A negative reward equal to the height of the current tower is added at every time step.                                                                              |
-| `penalise_height_increase` | Penalises an increase in the height of the Tetris tower. At each time step, if the height increases then a negative reward equal to the increase is given.                                                                                |
-| `advanced_clears`          | Changes the rewards for clearing lines to be similar to the modern Tetris system. The new rewards are 100 for a single line clear, 250 for a double line clear, 750 for a triple line clear and 3000 for a Tetris (quadruple line clear). |
-| `high_scoring`             | Changes the reward given for each line clear to 1000.                                                                                                                                                                                     |
-| `penalise_holes`           | Penalises the number of holes in the current Tetris tower. A hole is an empty cell with at least one non-empty cell above it.                                                                                                             |
-| `penalise_holes_increase`  | Penalises an increase in the number of holes in the current Tetris tower.                                                                                                                                                                 |
-
-**Note: `penalise_height` and `penalise_height_increase` cannot be used together.
-If both are enabled then `penalise_height` will be used.**
-
-**Note: `penalise_holes` and `penalise_holes_increase` cannot be used together.
-If both are enabled then `penalise_holes` will be used.**
+| Option                     | Description                                                                                                                                                                                                                                                                                              |
+|:---------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `reward_step`              | Adds a reward of +1 for every time step that does not include a line clear or end of game.                                                                                                                                                                                                               |
+| `penalise_height`          | Penalises the height of the current Tetris tower at every piece lock. `enabled` adds a negative reward equal to the height of the tower whilst `increase` adds a negative reward equal to the increase in height of the tower.                                                                           |
+| `advanced_clears`          | Changes the rewards for clearing lines to be similar to the modern Tetris system. The new rewards are 100 for a single line clear, 250 for a double line clear, 750 for a triple line clear and 3000 for a Tetris (quadruple line clear).                                                                |
+| `high_scoring`             | Changes the reward given for each line clear to 1000.                                                                                                                                                                                                                                                    |
+| `penalise_holes`           | Penalises the number of holes in the current Tetris tower. A hole is an empty cell with at least one non-empty cell above it. `enabled` adds a negative reward equal to the number of holes in the tower whilst `increase` adds a negative reward equal to the increase in number of holes in the tower. |
 
 ### `info` dictionary
 

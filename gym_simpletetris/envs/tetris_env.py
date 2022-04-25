@@ -129,23 +129,21 @@ class TetrisEngine:
                  lock_delay=0,
                  step_reset=False,
                  reward_step=False,
-                 penalise_height=False,
-                 penalise_height_increase=False,
+                 penalise_height=None,
                  advanced_clears=False,
                  high_scoring=False,
-                 penalise_holes=False,
-                 penalise_holes_increase=False):
+                 penalise_holes=None):
         self.width = width
         self.height = height
         self.board = np.zeros(shape=(width, height), dtype=np.float)
         self._scoring = {
             'reward_step': reward_step,
-            'penalise_height': penalise_height,
-            'penalise_height_increase': penalise_height_increase,
+            'penalise_height': True if penalise_height == 'enabled' else False,
+            'penalise_height_increase': True if penalise_height == 'increase' else False,
             'advanced_clears': advanced_clears,
             'high_scoring': high_scoring,
-            'penalise_holes': penalise_holes,
-            'penalise_holes_increase': penalise_holes_increase
+            'penalise_holes': True if penalise_holes == 'enabled' else False,
+            'penalise_holes_increase': True if penalise_holes == 'increase' else False
         }
 
         # actions are triggered by letters
@@ -345,32 +343,24 @@ class TetrisEnv(gym.Env):
                  height=20,
                  obs_type='ram',
                  extend_dims=False,
-                 reward_step=False,
-                 penalise_height=False,
-                 penalise_height_increase=False,
-                 advanced_clears=False,
-                 high_scoring=False,
-                 penalise_holes=False,
-                 penalise_holes_increase=False,
-                 lock_delay=0,
-                 step_reset=False):
+                 **kwargs):
         self.width = width
         self.height = height
         self.obs_type = obs_type
         self.extend_dims = extend_dims
         self.window_size = 512
 
+        reward_step = False,
+        penalise_height = None,
+        advanced_clears = False,
+        high_scoring = False,
+        penalise_holes = None,
+        lock_delay = 0,
+        step_reset = False
+
         self.engine = TetrisEngine(width,
                                    height,
-                                   lock_delay,
-                                   step_reset,
-                                   reward_step,
-                                   penalise_height,
-                                   penalise_height_increase,
-                                   advanced_clears,
-                                   high_scoring,
-                                   penalise_holes,
-                                   penalise_holes_increase)
+                                   **kwargs)
 
         self.action_space = spaces.Discrete(7)
         self.window = None
