@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='gym_simpletetris',
-    version='0.4.0',
+    version='1.0.0',
     author="Tristan Russell",
     license='MIT',
     description="A simple Tetris engine for OpenAI Gym",
